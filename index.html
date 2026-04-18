@@ -3,87 +3,98 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CIPHER — deduction console</title>
+    <title>FOUNDRY — a factory automation sandbox</title>
     <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='72' text-anchor='middle'>◆</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='76' font-size='86' text-anchor='middle'>⚙</text></svg>" />
   </head>
   <body>
-    <div id="app">
-      <header class="hud">
-        <div class="brand">
-          <div class="mark">◆◇</div>
-          <div class="wordmark">
-            <div class="title">CIPHER</div>
-            <div class="subtitle">// deduction console</div>
-          </div>
-        </div>
-        <div class="meta">
-          <div class="meta-block" title="Current tier">
-            <span class="meta-label">tier</span>
-            <span class="meta-value" id="meta-tier">I</span>
-          </div>
-          <div class="meta-block" title="Codes solved total">
-            <span class="meta-label">solved</span>
-            <span class="meta-value" id="meta-solved">0</span>
-          </div>
-          <div class="meta-block" title="Current streak">
-            <span class="meta-label">streak</span>
-            <span class="meta-value" id="meta-streak">0</span>
-          </div>
-          <div class="meta-block insight" title="Insight tokens — earned by efficient solves, spent on hints">
-            <span class="meta-label">insight</span>
-            <span class="meta-value" id="meta-insight">0</span>
-          </div>
-        </div>
-      </header>
+    <canvas id="world"></canvas>
 
-      <main class="workspace">
-        <section class="console" aria-label="Deduction log">
-          <div class="console-head">
-            <div class="brief" id="brief">INITIALIZING…</div>
-            <div class="attempts" id="attempts"></div>
-          </div>
-          <div class="board" id="board" role="log" aria-live="polite"></div>
-        </section>
-
-        <section class="panel" aria-label="Input panel">
-          <div class="panel-head">
-            <div class="hint-line" id="hint-line">// select symbols below, then lock guess</div>
-            <div class="mode-toggle">
-              <button class="mode-btn active" data-mode="classic" type="button" title="Feedback = total exact / present counts">CLASSIC</button>
-              <button class="mode-btn" data-mode="strict" type="button" title="Feedback = per-slot status (harder to parse, more info)">STRICT</button>
-            </div>
-          </div>
-          <div class="stage" id="stage" aria-label="Current guess"></div>
-          <div class="palette" id="palette" aria-label="Symbol palette"></div>
-          <div class="controls">
-            <button class="ctl ctl-primary" id="submit" type="button">LOCK GUESS <kbd>⏎</kbd></button>
-            <button class="ctl" id="clear" type="button">CLEAR <kbd>⌫</kbd></button>
-            <button class="ctl ctl-insight" id="insight" type="button" title="Reveal one slot — costs 1 insight">INSIGHT <kbd>H</kbd></button>
-            <button class="ctl" id="surrender" type="button" title="Abandon this code — resets streak">ABANDON</button>
-          </div>
-        </section>
-      </main>
-
-      <footer class="foot">
-        <div class="foot-l">
-          <span>keys:</span>
-          <kbd>1-0</kbd> pick &nbsp;
-          <kbd>⏎</kbd> lock &nbsp;
-          <kbd>⌫</kbd> clear &nbsp;
-          <kbd>H</kbd> insight &nbsp;
-          <kbd>M</kbd> mute
-        </div>
-        <div class="foot-r">
-          <button id="how" type="button" class="link">how to play</button>
-          <button id="stats" type="button" class="link">stats</button>
-          <button id="reset" type="button" class="link danger">reset progress</button>
-        </div>
-      </footer>
-
-      <div class="modal-root" id="modal-root" hidden></div>
-      <div class="toast" id="toast" hidden></div>
+    <div id="hud-top">
+      <div class="brand">
+        <span class="mark">⚙</span>
+        <span class="wordmark">
+          <span class="title">FOUNDRY</span>
+          <span class="sub">// build the rocket</span>
+        </span>
+      </div>
+      <div class="goal" id="goal">
+        <span class="g-label">ROCKET PARTS</span>
+        <span class="g-count"><span id="g-have">0</span> / <span id="g-need">10</span></span>
+        <div class="g-bar"><div id="g-fill"></div></div>
+      </div>
+      <div class="sim-ctl">
+        <button id="speed-down" title="Slower">«</button>
+        <button id="pause" title="Pause/Resume">▮▮</button>
+        <button id="speed-up" title="Faster">»</button>
+        <span id="speed-label">1×</span>
+      </div>
     </div>
+
+    <aside id="toolbar">
+      <div class="tool-group" id="tools"></div>
+      <div class="tool-sep"></div>
+      <div class="tool-group">
+        <button class="tool" data-tool="rotate" title="Rotate (R)"><span class="tg">↻</span><span class="tk">R</span></button>
+        <button class="tool danger" data-tool="demolish" title="Demolish (X)"><span class="tg">✕</span><span class="tk">X</span></button>
+        <button class="tool" data-tool="pick" title="Inspect / pick (Q)"><span class="tg">◌</span><span class="tk">Q</span></button>
+      </div>
+    </aside>
+
+    <div id="hud-bottom">
+      <div class="inv" id="inv"></div>
+    </div>
+
+    <aside id="side-panel" class="hidden">
+      <div class="sp-head">
+        <span id="sp-title">BUILDING</span>
+        <button class="sp-close" id="sp-close" title="Close (Esc)">✕</button>
+      </div>
+      <div class="sp-body" id="sp-body"></div>
+    </aside>
+
+    <div id="help" class="hidden">
+      <div class="help-card">
+        <h2>FOUNDRY</h2>
+        <p class="sub">// drag items from rock to rocket</p>
+        <ul class="cols">
+          <li><kbd>1-5</kbd> pick build tool</li>
+          <li><kbd>R</kbd> rotate direction</li>
+          <li><kbd>X</kbd> demolish tool</li>
+          <li><kbd>Q</kbd> inspect</li>
+          <li><kbd>Esc</kbd> cancel tool / close</li>
+          <li><kbd>WASD</kbd> or drag with <kbd>Middle</kbd>: pan</li>
+          <li><kbd>Wheel</kbd> zoom</li>
+          <li><kbd>Space</kbd> pause · <kbd>+ / -</kbd> speed</li>
+          <li><kbd>Left</kbd> place · <kbd>Right</kbd> cancel/remove</li>
+          <li><kbd>H</kbd> toggle this help</li>
+        </ul>
+        <div class="play">
+          <h3>how to play</h3>
+          <ol>
+            <li><b>Mine ore</b>. Place a <i>Miner</i> on a colored ore patch (iron, copper, coal, stone). It drops items facing its arrow.</li>
+            <li><b>Move it</b>. Chain <i>Belts</i> from the miner to a factory.</li>
+            <li><b>Smelt</b>. Feed ore into a <i>Furnace</i>. Select a recipe from its panel.</li>
+            <li><b>Assemble</b>. Feed plates and intermediates into an <i>Assembler</i>. Select a recipe.</li>
+            <li><b>Deliver</b>. Run the final belt into the <i>Rocket Silo</i> (place one anywhere) with rocket parts.</li>
+          </ol>
+          <p class="tip">Tip: back-pressure is fine — if the next tile is full, items queue. Build parallel lines for throughput.</p>
+        </div>
+        <button id="help-close" class="btn primary">got it</button>
+      </div>
+    </div>
+
+    <div id="win" class="hidden">
+      <div class="help-card">
+        <h2>LIFT-OFF</h2>
+        <p class="sub">// the rocket has launched</p>
+        <p>You built a full supply chain from raw ore to rocket parts. Nice system.</p>
+        <p id="win-stats"></p>
+        <button id="win-close" class="btn primary">keep building</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
 
     <script src="game.js" defer></script>
   </body>
