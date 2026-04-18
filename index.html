@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CIPHER — deduction console</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='72' text-anchor='middle'>◆</text></svg>" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hud">
+        <div class="brand">
+          <div class="mark">◆◇</div>
+          <div class="wordmark">
+            <div class="title">CIPHER</div>
+            <div class="subtitle">// deduction console</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-block" title="Current tier">
+            <span class="meta-label">tier</span>
+            <span class="meta-value" id="meta-tier">I</span>
+          </div>
+          <div class="meta-block" title="Codes solved total">
+            <span class="meta-label">solved</span>
+            <span class="meta-value" id="meta-solved">0</span>
+          </div>
+          <div class="meta-block" title="Current streak">
+            <span class="meta-label">streak</span>
+            <span class="meta-value" id="meta-streak">0</span>
+          </div>
+          <div class="meta-block insight" title="Insight tokens — earned by efficient solves, spent on hints">
+            <span class="meta-label">insight</span>
+            <span class="meta-value" id="meta-insight">0</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="console" aria-label="Deduction log">
+          <div class="console-head">
+            <div class="brief" id="brief">INITIALIZING…</div>
+            <div class="attempts" id="attempts"></div>
+          </div>
+          <div class="board" id="board" role="log" aria-live="polite"></div>
+        </section>
+
+        <section class="panel" aria-label="Input panel">
+          <div class="panel-head">
+            <div class="hint-line" id="hint-line">// select symbols below, then lock guess</div>
+            <div class="mode-toggle">
+              <button class="mode-btn active" data-mode="classic" type="button" title="Feedback = total exact / present counts">CLASSIC</button>
+              <button class="mode-btn" data-mode="strict" type="button" title="Feedback = per-slot status (harder to parse, more info)">STRICT</button>
+            </div>
+          </div>
+          <div class="stage" id="stage" aria-label="Current guess"></div>
+          <div class="palette" id="palette" aria-label="Symbol palette"></div>
+          <div class="controls">
+            <button class="ctl ctl-primary" id="submit" type="button">LOCK GUESS <kbd>⏎</kbd></button>
+            <button class="ctl" id="clear" type="button">CLEAR <kbd>⌫</kbd></button>
+            <button class="ctl ctl-insight" id="insight" type="button" title="Reveal one slot — costs 1 insight">INSIGHT <kbd>H</kbd></button>
+            <button class="ctl" id="surrender" type="button" title="Abandon this code — resets streak">ABANDON</button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <div class="foot-l">
+          <span>keys:</span>
+          <kbd>1-0</kbd> pick &nbsp;
+          <kbd>⏎</kbd> lock &nbsp;
+          <kbd>⌫</kbd> clear &nbsp;
+          <kbd>H</kbd> insight &nbsp;
+          <kbd>M</kbd> mute
+        </div>
+        <div class="foot-r">
+          <button id="how" type="button" class="link">how to play</button>
+          <button id="stats" type="button" class="link">stats</button>
+          <button id="reset" type="button" class="link danger">reset progress</button>
+        </div>
+      </footer>
+
+      <div class="modal-root" id="modal-root" hidden></div>
+      <div class="toast" id="toast" hidden></div>
+    </div>
+
+    <script src="game.js" defer></script>
+  </body>
+</html>
